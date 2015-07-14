@@ -34,7 +34,6 @@ var displayMessages = function(data) {
       selectArr.push(data.results[i].roomname);
     }
   }
-  console.log(data.results)
   var newArr = _.uniq(selectArr);
   for (var i=0; i<newArr.length; i++) {
     $("select").append("<option value=" + newArr[i] + ">" + newArr[i] + "</option>");
@@ -84,10 +83,11 @@ app.send = function(message){
 
 app.clearMessages = function() {
   $('.messages').remove();
+  $("select > option").remove();
 };
 
 app.addMessage = function(data) {
-  $("#chats").append("<div class='messages'>" + window.sanitize(data.username) + ': ' + sanitize(data.text) + "</div>");
+  $("#chats").append("<div class='messages " + data.roomname + "'>" + window.sanitize(data.username) + ': ' + window.sanitize(data.text) + "</div>");
 };
 
 // app.createDropdown = function(array) {
@@ -109,11 +109,15 @@ $(document).ready(function(){
       $('select').append(tester);
       selectArr.push(room)
     }
+    $("select").val(room);
   });
 
   $("select").change(function() {
     var currentRoom = $('select option:selected').text();
-
+    $("div.messages").show();
+    $("div.messages").filter(function(){
+      return !$(this).hasClass(currentRoom);
+    }).hide();
   });
 
   $('#refresher').on('click', function(){
@@ -125,11 +129,14 @@ $(document).ready(function(){
     var messageBro = {
       username: location.search.substring(10),
       text: $('.messageInput').val(),
-      roomname: $('select option:selected').text()
+      roomname: $('select option:selected').text() || "4chan"
     }
     //console.log(messageBro)
     app.send(messageBro);
-    $('#refresher').trigger('click');
+    $("#chats").prepend("<div class='messages " + messageBro.roomname + "'>" + window.sanitize(messageBro.username) + ': ' + window.sanitize(messageBro.text) + "</div>");
+
+    // $('#refresher').trigger('click');
+    //append?
   });
 
   $("form").submit(function(e) {
