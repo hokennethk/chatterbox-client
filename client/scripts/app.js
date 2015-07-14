@@ -36,13 +36,14 @@ var displayMessages = function(data) {
   }
   var newArr = _.uniq(selectArr);
   for (var i=0; i<newArr.length; i++) {
-    $("select").append("<option value=" + newArr[i] + ">" + newArr[i] + "</option>");
+    $("select").append("<option value='" + newArr[i] + "''>" + newArr[i] + "</option>");
   }
 };
 
 
 
 var app = {};
+app.friendsList = [];
 
 app.init = function(){
   this.server = 'https://api.parse.com/1/classes/chatterbox';
@@ -87,7 +88,11 @@ app.clearMessages = function() {
 };
 
 app.addMessage = function(data) {
-  $("#chats").append("<div class='messages " + data.roomname + "'>" + window.sanitize(data.username) + ': ' + window.sanitize(data.text) + "</div>");
+  if(app.friendsList.indexOf(data.username) !== -1){
+    $("#chats").append("<div class='messages" + data.roomname + "'>" + '<button class="username friend">' + window.sanitize(data.username) + '</button>' + ': ' + window.sanitize(data.text) + "</div>");
+  }else{
+    $("#chats").append("<div class='messages " + data.roomname + "'>" + '<button class= "username">' + window.sanitize(data.username) + '</button>' + ': ' + window.sanitize(data.text) + "</div>");
+  }
 };
 
 app.addRoom = function(room) {
@@ -96,7 +101,7 @@ app.addRoom = function(room) {
     console.log("no room name given");
     return null;
   }
-  var tester = "<option value=" + room + ">" + room + "</option>"
+  var tester = "<option value='" + room + "''>" + room + "</option>"
   if (selectArr.indexOf(room) === -1){
     $('#roomSelect').append(tester);
     selectArr.push(room)
@@ -105,7 +110,35 @@ app.addRoom = function(room) {
   $("#roomSelect").val(room);
 }
 
-app.addFriend = function() {};
+app.addFriend = function(friend) {
+  if (app.friendsList.indexOf(friend) === -1) {
+    app.friendsList.push(friend);
+    var username = $('.username');
+    for(var i = 0; i < username.length; i++){
+      if(username[i].textContent === friend){
+        $(username[i]).addClass('friend')
+      }
+    }
+  }
+};
+
+app.handleSubmit = function() {
+  var messageBro = {
+    username: location.search.substring(10),
+    text: $('.messageInput').val(),
+    roomname: $('select option:selected').text() || "4chan"
+  }
+  //console.log(messageBro)
+  app.send(messageBro);
+
+  // trigger room filter
+
+
+  $("#chats").prepend("<div class='messages " + messageBro.roomname + "'>" + '<button class= friends>' + window.sanitize(messageBro.username) + '</button>' + ': ' + window.sanitize(messageBro.text) + "</div>");
+
+  // $('#refresher').trigger('click');
+  //append?
+};
 
 // app.createDropdown = function(array) {
 //   for (var i=0; i<array.length; i++) {
@@ -124,6 +157,10 @@ $(document).ready(function(){
     app.addRoom(room);
   });
 
+  $("#chats").on("click", ".username", function() {
+    app.addFriend($(this).text());
+  });
+
   $("select").change(function() {
     var currentRoom = $('select option:selected').text();
     $("div.messages").show();
@@ -137,22 +174,8 @@ $(document).ready(function(){
     app.fetch();
   });
 
-  $('#sendButton').on('click', function(){
-    var messageBro = {
-      username: location.search.substring(10),
-      text: $('.messageInput').val(),
-      roomname: $('select option:selected').text() || "4chan"
-    }
-    //console.log(messageBro)
-    app.send(messageBro);
-
-    // trigger room filter
-
-
-    $("#chats").prepend("<div class='messages " + messageBro.roomname + "'>" + window.sanitize(messageBro.username) + ': ' + window.sanitize(messageBro.text) + "</div>");
-
-    // $('#refresher').trigger('click');
-    //append?
+  $('#send').on('submit', function(){
+    app.handleSubmit();
   });
 
   $("form").submit(function(e) {
