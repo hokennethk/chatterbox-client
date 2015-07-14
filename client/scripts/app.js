@@ -82,13 +82,30 @@ app.send = function(message){
 }
 
 app.clearMessages = function() {
-  $('.messages').remove();
-  $("select > option").remove();
+  $('#chats').children().remove();
+  $("#roomSelect").children().remove();
 };
 
 app.addMessage = function(data) {
   $("#chats").append("<div class='messages " + data.roomname + "'>" + window.sanitize(data.username) + ': ' + window.sanitize(data.text) + "</div>");
 };
+
+app.addRoom = function(room) {
+  // var room = $(".new-room-name").val();
+  if (room === undefined) {
+    console.log("no room name given");
+    return null;
+  }
+  var tester = "<option value=" + room + ">" + room + "</option>"
+  if (selectArr.indexOf(room) === -1){
+    $('#roomSelect').append(tester);
+    selectArr.push(room)
+  }
+
+  $("#roomSelect").val(room);
+}
+
+app.addFriend = function() {};
 
 // app.createDropdown = function(array) {
 //   for (var i=0; i<array.length; i++) {
@@ -104,12 +121,7 @@ $(document).ready(function(){
 
   $(".roomButton").on('click', function() {
     var room = $(".new-room-name").val();
-    var tester = "<option value=" + room + ">" + room + "</option>"
-    if (selectArr.indexOf(room) === -1){
-      $('select').append(tester);
-      selectArr.push(room)
-    }
-    $("select").val(room);
+    app.addRoom(room);
   });
 
   $("select").change(function() {
@@ -133,6 +145,10 @@ $(document).ready(function(){
     }
     //console.log(messageBro)
     app.send(messageBro);
+
+    // trigger room filter
+
+
     $("#chats").prepend("<div class='messages " + messageBro.roomname + "'>" + window.sanitize(messageBro.username) + ': ' + window.sanitize(messageBro.text) + "</div>");
 
     // $('#refresher').trigger('click');
