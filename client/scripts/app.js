@@ -36,7 +36,7 @@ var displayMessages = function(data) {
   }
   var newArr = _.uniq(selectArr);
   for (var i=0; i<newArr.length; i++) {
-    $("select").append("<option value='" + newArr[i] + "''>" + newArr[i] + "</option>");
+    $("select").append("<option value='" + sanitize(newArr[i]) + "''>" + sanitize(newArr[i]) + "</option>");
   }
 };
 
@@ -101,7 +101,7 @@ app.addRoom = function(room) {
     console.log("no room name given");
     return null;
   }
-  var tester = "<option value='" + room + "''>" + room + "</option>"
+  var tester = "<option value='" + sanitize(room) + "''>" + sanitize(room) + "</option>"
   if (selectArr.indexOf(room) === -1){
     $('#roomSelect').append(tester);
     selectArr.push(room)
