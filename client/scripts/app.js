@@ -1,12 +1,3 @@
-// YOUR CODE HERE:
-/*
-var message = {
-  username: 'shawndrost',
-  text: 'trololo',
-  roomname: '4chan'
-};
-*/
-
 window.escaped = {
   "&": "&amp;",
   "<": "&lt;",
@@ -67,7 +58,6 @@ app.fetch = function() {
 
 app.send = function(message){
   return $.ajax({
-    // This is the url you should use to communicate with the parse API server.
     url: 'https://api.parse.com/1/classes/chatterbox',
     type: 'POST',
     data: JSON.stringify(message),
@@ -76,7 +66,6 @@ app.send = function(message){
       console.log('chatterbox: Message sent');
     },
     error: function (data) {
-      // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
       console.error('chatterbox: Failed to send message');
     }
   });
@@ -96,7 +85,6 @@ app.addMessage = function(data) {
 };
 
 app.addRoom = function(room) {
-  // var room = $(".new-room-name").val();
   if (room === undefined) {
     console.log("no room name given");
     return null;
@@ -128,29 +116,13 @@ app.handleSubmit = function() {
     text: $('.messageInput').val(),
     roomname: $('select option:selected').text() || "4chan"
   }
-  //console.log(messageBro)
   app.send(messageBro);
-
   // trigger room filter
-
-
   $("#chats").prepend("<div class='messages " + messageBro.roomname + "'>" + '<button class= friends>' + window.sanitize(messageBro.username) + '</button>' + ': ' + window.sanitize(messageBro.text) + "</div>");
-
-  // $('#refresher').trigger('click');
-  //append?
 };
-
-// app.createDropdown = function(array) {
-//   for (var i=0; i<array.length; i++) {
-//     console.log(array[i])
-//     $("select").append("<option>" + array[i] + "</option>");
-//   }
-// };
-
 
 $(document).ready(function(){
   app.init();
-  // app.createDropdown(selectArr);
 
   $(".roomButton").on('click', function() {
     var room = $(".new-room-name").val();
